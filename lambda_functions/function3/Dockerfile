@@ -1,6 +1,6 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-RUN yum install -y postgresql-devel gcc python3-devel postgresql-libs
+RUN yum install -y postgresql-devel gcc python3-devel
 
 COPY database/ /var/task/database/
 # Copy the function-specific app directory
