@@ -12,12 +12,20 @@ IMAGE_TAG="latest"
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 AWS_PROFILE="${AWS_PROFILE}"
 
+# Create temporary build context
+echo "Creating temporary build context..."
+mkdir -p temp_build
+cp -r app temp_build/
+cp -r ../../database temp_build/
+cp Dockerfile temp_build/
+
 # Step 1: Build Docker Image with buildx for x86_64 architecture
 echo "🚀 Building Docker image for $FUNCTION_NAME (x86_64 architecture)..."
 docker buildx build \
   --platform linux/amd64 \
   --load \
-  -t ${ECR_REPO}:${IMAGE_TAG} .
+  -t ${ECR_REPO}:${IMAGE_TAG} \
+  temp_build
 
 # Step 2: Authenticate Docker to ECR using AWS profile
 echo "🔑 Authenticating with AWS ECR..."
@@ -35,5 +43,9 @@ aws lambda update-function-code \
   --function-name ${FUNCTION_NAME} \
   --image-uri ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} \
   --profile ${AWS_PROFILE}
+
+# Cleanup
+echo "Cleaning up temporary build context..."
+rm -rf temp_build
 
 echo "✅ Deployment of $FUNCTION_NAME complete!"

@@ -1,2 +1,2 @@
-function1/config.env
-function2/config.env
+lambda_functions/function1/config.env
+lambda_functions/function2/config.env
